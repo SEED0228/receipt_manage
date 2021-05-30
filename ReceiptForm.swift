@@ -36,6 +36,7 @@ struct ReceiptForm: View {
                     TextField("入力してください", text: $store_name)
                 }
                 DatePicker("購入日　:", selection: $date)
+                    .datePickerStyle(WheelDatePickerStyle())
             
                 ForEach(items) { item in
                     if selected_item_id != item.id {
@@ -147,7 +148,7 @@ struct ReceiptForm: View {
                             Form {
                                 Button(action: {
                                     showingReceiptForm = true
-                                    getReceiptInformation()
+                                    getReceiptInformation2() //////////////////////////////////////////////
                                     
                                 })
                                 {
@@ -252,14 +253,14 @@ struct ReceiptForm: View {
           guard error == nil, let result = result else {
             return
           }
-            // 値段を記載している箇所を取得
-            var price_lines: [VisionTextLine] = []
             // 全文字列を取得
             var acquired_lines: [VisionTextLine] = []
+            // 値段を記載している箇所を取得
+            var price_lines: [VisionTextLine] = []
             // 省くものリスト（完全一致）
-            let ExactMatchOmittionList: [String] = ["小計", "外税", "外税売"]
+            let ExactMatchOmittionList: [String] = ["外税", "外税売"]
             // 省くものリスト（部分一致）
-            let PartialMatchOmittionList: [String] = ["値引","端数","税"]
+            let PartialMatchOmittionList: [String] = ["値引","端数","税","小計"]
             for block in result.blocks {
                 var cnt = 0
                 for line in block.lines {
@@ -276,12 +277,12 @@ struct ReceiptForm: View {
                         acquired_lines.append(line)
                     }
                 }
-                
             }
             // y座標、昇順に並び替え
             acquired_lines = acquired_lines.sorted(by: {
                 $0.frame.origin.y < $1.frame.origin.y
             } )
+            
             // 先頭の文字列を店名とする
             store_name = acquired_lines[0].text
             price: for price_line in price_lines {
@@ -315,6 +316,32 @@ struct ReceiptForm: View {
             }
         }
     }
+    
+    func getReceiptInformation2() {
+        let vision = Vision.vision()
+        let options = VisionCloudTextRecognizerOptions()
+        options.languageHints = ["en", "ja"]
+        let textRecognizer = vision.cloudTextRecognizer(options: options)
+        let visionimage = VisionImage(image: image!)
+        textRecognizer.process(visionimage) { result, error in
+          guard error == nil, let result = result else {
+            return
+          }
+            // 全文字列を取得
+            let lines: [VisionTextLine] = getReceiptLines(result: result)
+            let lines_group: [[VisionTextLine]] = getReceiptLinesGroup(lines: lines)
+            printReceiptLineLanguage(lines_group: lines_group, lines: lines)
+            if LogoCheck() == "familymart" {
+                
+            }
+            else {
+                
+            }
+        }
+    }
+    
+    
+    
     //　数値の抽出
     func NumericalExtraction(_ str: String) -> Int {
         let splitNumbers = (str.components(separatedBy: NSCharacterSet.decimalDigits.inverted))
@@ -322,7 +349,146 @@ struct ReceiptForm: View {
         return Int(number) ?? 0
     }
     
+    func getReceiptLines(result: VisionText) -> [VisionTextLine] {
+        var lines: [VisionTextLine] = []
+        for block in result.blocks {
+            var cnt = 0
+            for line in block.lines {
+                //print(String(cnt) + "," + line.text + "," + String(format: "%.01f", Float(line.frame.origin.x)) + "," + String(format: "%.01f", Float(line.frame.origin.y)) )
+                cnt += 1
+                lines.append(line)
+                
+            }
+        }
+        // y座標、昇順に並び替え
+        lines = lines.sorted(by: {
+            $0.frame.origin.y < $1.frame.origin.y
+        } )
+        return lines
+    }
+    
+    
+    
+    func getReceiptLinesGroup(lines: [VisionTextLine]) -> [[VisionTextLine]] {
+        
+        var min_height: CGFloat = 100000.0
+        for line in lines {
+            if line.frame.size.height < min_height {
+                min_height = line.frame.size.height
+            }
+        }
+        var lines_group = [[lines[0]]]
+        var right_lines: [VisionTextLine] = []
+        var current_index = 0
+        for i in 1..<(lines.count) {
+            // (テキストの左端が半分以上でかつテキストの右端がレシートの5/7)後で処理
+            if Float(lines[i].frame.origin.x) >= Float(image!.size.width) / 2.0
+                && Float(lines[i].frame.origin.x) + Float(lines[i].frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                right_lines.append(lines[i])
+            }
+            else if abs(Float(lines[i].frame.origin.y) - Float(lines[i-1].frame.origin.y)) < Float(min_height) * 2.0 / 5.0 {
+                lines_group[current_index].append(lines[i])
+            }
+            else {
+                lines_group[current_index] = lines_group[current_index].sorted(by: {
+                    $0.frame.origin.x < $1.frame.origin.x
+                } )
+                lines_group.append([lines[i]])
+                current_index += 1
+            }
+        }
+        for line in right_lines {
+            var min_dist:CGFloat = 10000.0
+            var min_index = -1
+            for (i, lines) in lines_group.enumerated() {
+                if min_dist > abs(lines.last!.frame.origin.y - line.frame.origin.y) {
+                    min_dist = abs(lines.last!.frame.origin.y - line.frame.origin.y)
+                    min_index = i
+                }
+                if line.frame.origin.y < lines.last!.frame.origin.y {
+                    if min_dist > abs(line.frame.origin.y - lines.last!.frame.origin.y) {
+                        min_dist = abs(line.frame.origin.y - lines.last!.frame.origin.y)
+                        min_index = i
+                    }
+                    lines_group[min_index].append(line)
+                    break
+                }
+            }
+        }
+        
+        return lines_group
+    }
+    
+    func printReceiptLineLanguage(lines_group: [[VisionTextLine]], lines: [VisionTextLine]) {
+        var line_width_text = ""
+        var line_text = ""
+        var double_angle_text = ""
+        var min_height_line: VisionTextLine = lines[0]
+        var min_height: CGFloat = 10000.0
+        for line in lines {
+            if min_height > line.frame.size.height {
+                min_height = line.frame.size.height
+                min_height_line = line
+            }
+        }
+        let char_count = characterCount(line: min_height_line)
+        var prev_x: CGFloat
+        for g_lines in lines_group {
+            line_width_text = "{width:"
+            line_text = "||"
+            double_angle_text = ""
+            prev_x = 0.0
+            for (i, line) in g_lines.enumerated() {
+//                    print(String(cnt) + "," + line.text
+//                            + "," + String(format: "%.01f", Float(line.frame.origin.x))
+//                            + "," + String(format: "%.01f", Float(line.frame.origin.y))
+//                            + "," + String(format: "%.01f",Float(line.frame.size.width))
+//                            + "," + String(format: "%.01f",Float(line.frame.size.height)), terminator: " ")
+                for _ in 1..<max(1, Int(floor(line.frame.size.height / min_height * 2 / 3))) {
+                    double_angle_text += "^"
+                }
+                line_width_text += String(Int((line.frame.origin.x - prev_x) / image!.size.width * CGFloat(char_count))) + ","
+                if i > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                    line_text += " " + double_angle_text + line.text + "|"
+                }
+                else {
+                    line_text += double_angle_text + line.text + " |"
+                }
+                prev_x = line.frame.origin.x
+            }
+            line_width_text += String(Int((image!.size.width - prev_x) / image!.size.width * CGFloat(char_count))) + "}"
+            print(line_width_text)
+            print(line_text)
+        }
+    }
+    
+    //文字数カウント
+    func characterCount(line: VisionTextLine) -> Int {
+        let textArray = Array(line.text).map { String($0) }
+        var count = 0
+        let format = "[ -~]"
+        let regexp = try! NSRegularExpression.init(pattern: format, options: [])
+        for i in 0..<line.text.count {
+            let matchRet = regexp.firstMatch(in: textArray[i], options: [], range: NSRange.init(location: 0, length: 1))
+            if matchRet != nil {
+                count += 1
+            }
+            else {
+                count += 2
+            }
+        }
+        print(line.text)
+        print(count)
+        print(line.frame.size.width)
+        print(image!.size.width)
+        return Int(Float(count) * Float(image!.size.width / line.frame.size.width) )
+    }
 
+    //パターン認識でロゴをチェック（予定）
+    func LogoCheck() -> String {
+        return "familymart"
+    }
+    
 }
 
 struct ReceiptForm_Previews: PreviewProvider {

@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct Receipt:Identifiable, Equatable, Codable{
+struct Receipt:Identifiable, Equatable, Codable {
     var id = UUID()
     var store_name: String
     var date: Date

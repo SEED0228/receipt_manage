@@ -71,19 +71,23 @@ struct ContentView: View {
                             {
                                 ReceiptListRow(receipt: receipt, delete_option: userData.delete_option)
                             }
-                            if receipt.is_selected {
-                                if receipt.items.count == 0 {
-                                    Text("no items")
-                                }
-                                else {
-                                    ForEach(receipt.items) { item in
-                                        ItemListRow(item: item)
-                                    }
+                            if receipt.is_selected || receipt.items.count == 0 {
+                                Text("no items")
+                            }
+                            else if receipt.is_selected {
+                                ForEach(receipt.items) { item in
+                                    ItemListRow(item: item)
                                 }
                             }
+                            
                         }
                     }
                 }
+                .onDelete(perform: { indexSet in
+                    self.userData.receipts.remove(at: indexSet.first!)
+                    saveReceiptsToDevise()
+                  })
+                
                 
                 HStack {
                     NavigationLink(destination: ReceiptForm()) {
