@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0309CA64267137A8007E7F39 /* ReceiptLineStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0309CA63267137A8007E7F39 /* ReceiptLineStruct.swift */; };
 		0314E8BB2629324600FA282D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0314E8BA2629324600FA282D /* GoogleService-Info.plist */; };
 		0314E8DC26293C4000FA282D /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = 0314E8DB26293C4000FA282D /* sample.png */; };
 		0330298D2620420A00CF982E /* ReceiptForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0330298C2620420A00CF982E /* ReceiptForm.swift */; };
@@ -46,6 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0309CA63267137A8007E7F39 /* ReceiptLineStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptLineStruct.swift; sourceTree = "<group>"; };
 		0314E8BA2629324600FA282D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0314E8DB26293C4000FA282D /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample.png; sourceTree = "<group>"; };
 		0330298C2620420A00CF982E /* ReceiptForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptForm.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				035627CE262813670062109B /* tessdata */,
 				03ADC3AC261F038F00786199 /* ReceiptListRow.swift */,
 				03ADC3BC261F27C300786199 /* UserReceipt.swift */,
+				0309CA63267137A8007E7F39 /* ReceiptLineStruct.swift */,
 				0330298C2620420A00CF982E /* ReceiptForm.swift */,
 				0330299A2620751C00CF982E /* ItemListRow.swift */,
 				035627E0262848BA0062109B /* ImagePicker.swift */,
@@ -458,6 +461,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0330299B2620751C00CF982E /* ItemListRow.swift in Sources */,
+				0309CA64267137A8007E7F39 /* ReceiptLineStruct.swift in Sources */,
 				03ADC396261EFCF600786199 /* ContentView.swift in Sources */,
 				03ADC3BD261F27C300786199 /* UserReceipt.swift in Sources */,
 				0330298D2620420A00CF982E /* ReceiptForm.swift in Sources */,

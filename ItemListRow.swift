@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ItemListRow: View {
-    let item: Item
+    let item: Display_Item
     
     var body: some View {
         HStack {
@@ -24,6 +24,6 @@ struct ItemListRow: View {
 
 struct ItemListRow_Previews: PreviewProvider {
     static var previews: some View {
-        ItemListRow(item: Item())
+        ItemListRow(item: Display_Item())
     }
 }

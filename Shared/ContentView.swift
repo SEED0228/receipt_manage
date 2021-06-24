@@ -71,7 +71,8 @@ struct ContentView: View {
                             {
                                 ReceiptListRow(receipt: receipt, delete_option: userData.delete_option)
                             }
-                            if receipt.is_selected || receipt.items.count == 0 {
+                            //if receipt.is_selected || receipt.items.count == 0 {
+                            if receipt.items.count == 0 {
                                 Text("no items")
                             }
                             else if receipt.is_selected {
