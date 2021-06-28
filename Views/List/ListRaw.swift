@@ -18,9 +18,8 @@ struct ListRaw: View {
                     Spacer()
                     HStack {
                         Text(receipt_line.store_information.daytime.toStringTime())
-                            .bold()
-                            .font(.system(size: 15))
-                            .padding(.leading, 15)
+                            .font(.system(size: 20))
+                            .padding(.leading, 10)
                         Spacer()
                     }
                     
@@ -32,14 +31,14 @@ struct ListRaw: View {
                         HStack {
                             Text("¥\(receipt_line.accounting_information.total_sum)")
                                 .bold()
-                                .font(.system(size: 20))
+                                .font(.system(size: 24))
                                 
                             Spacer()
                         }
                         HStack {
                             Image(systemName: "location.circle")
                             Text("\(receipt_line.store_information.store_name),\(receipt_line.item_information.items[0].name)他\(receipt_line.item_information.count)件")
-                                .font(.system(size: 10))
+                                .font(.system(size: 15))
                                 .lineLimit(1)
                                 
                             Spacer()

@@ -17,6 +17,7 @@ enum FM_status: Int {
     case total_price = 5
     case accounting = 6
     case payment = 7
+    case finish = 8
 }
 
 enum Status {

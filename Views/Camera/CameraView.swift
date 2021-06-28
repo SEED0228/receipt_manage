@@ -233,18 +233,23 @@ struct CameraView: View {
             for (line) in g_lines {
                 if isBranchStore(text: line.text) {
                     existsBranchStore = i
+                    print("existsBranchStore=\(existsBranchStore)")
                 }
                 if isPhone(text: line.text) {
                     existsPhone = i
+                    print("Phone=\(existsPhone)")
                 }
                 if isDateTime(text: line.text) {
                     existsDateTime = i
+                    print("DateTime=\(existsDateTime)")
                 }
                 if isRegisterNumber(text: line.text) {
                     existsRegisterNumber = i
+                    print("Register=\(existsRegisterNumber)")
                 }
                 if isResponsibilyNumber(text: line.text) {
                     existsResponsibilyNumber = i
+                    print("Responsibily=\(existsResponsibilyNumber)")
                 }
                 if isReceipt(text: line.text) {
                     existsReceipt = i
@@ -264,6 +269,15 @@ struct CameraView: View {
             // 店情報、責任情報が取得できない場合
             if (existsBranchStore == -1 || existsPhone == -1 || existsDateTime == -1 || existsRegisterNumber == -1 || existsResponsibilyNumber == -1) && i <= existsReceipt {
                 processing_status = -1
+                if existsPhone == i {
+                    processing_status = FM_status.address.rawValue
+                }
+                else if existsDateTime == i {
+                    processing_status = FM_status.daytime.rawValue
+                }
+                else if existsRegisterNumber == i || existsResponsibilyNumber == i {
+                    processing_status = FM_status.registration.rawValue
+                }
             }
             // 領収証の後かどうか
             if existsReceipt + 1 == i {
@@ -360,11 +374,11 @@ struct CameraView: View {
                     case FM_status.registration.rawValue:
                         if line.text.prefix(2) == "レジ" {
                             receipt_line.register_information.register_number = String(line.text.suffix(line.text.count - 2))
-                            txt = "レジ #{receipt_line.register_information.register_number}"
+                            txt = "レジ #{register_information.register_number}"
                         }
                         else if line.text.prefix(1) == "責" {
                             receipt_line.register_information.responsibily_number =  String(NumericalExtraction(line.text))
-                            txt = "責No.#{receipt_line.register_information.register_number}"
+                            txt = "責No.#{register_information.register_number}"
                             processing_status = -1
                         }
                         else {
@@ -395,13 +409,21 @@ struct CameraView: View {
                             discount_total_flag = true
                             txt = line.text
                         }
-                        else if line.text.prefix(3) == "値引き" && j == 0 {
+                        else if line.text.contains("値引") && j == 0 {
                             discount_flag = true
                             txt = line.text
                         }
                         else if isMultiple(text: line.text) && j == 0 {
                             getMultiple(text: line.text, item: &new_item)
-                            txt = "@#{receipt_line.item_infotmation.items[\(element_count)].unit_price}× #{receipt_line.item_infotmation.items[\(element_count)].quantity}点"
+                            txt = "@#{item_infotmation.items[\(element_count)].unit_price}× #{item_infotmation.items[\(element_count)].quantity}点"
+                        }
+                        else if isQuantity(text: line.text) && j != 0 {
+                            getQuantity(text: line.text, item: &new_item)
+                            txt = "#{item_infotmation.items[\(element_count)].quantity}点"
+                        }
+                        else if isUnitPrice(text: line.text) && j == 0 {
+                            getUnitPrice(text: line.text, item: &new_item)
+                            txt = "@#{item_infotmation.items[\(element_count)].unit_price}×"
                         }
                         else if j == 0 {
                             if(new_item.id != -1){
@@ -412,27 +434,27 @@ struct CameraView: View {
                             element_count += 1
                             new_item = Item(element_count)
                             new_item.name = line.text
-                            txt = "#{receipt_line.item_infotmation.items[\(element_count)].name}"
+                            txt = "#{item_infotmation.items[\(element_count)].name}"
                         }
                         else if(discount_flag){
                             discount_flag = false
                             new_item.discount = NumericalExtraction(line.text)
-                            txt = "-#{receipt_line.item_infotmation.items[\(element_count)].discount}"
+                            txt = "-#{item_infotmation.items[\(element_count)].discount}"
                         }
                         else if(discount_total_flag){
                             discount_total_flag = false
                             receipt_line.accounting_information.discount_total = NumericalExtraction(line.text)
-                            txt = "-#{receipt_line.accounting_information.discount_total}"
+                            txt = "-#{accounting_information.discount_total}"
                         }
                         else if(item_total_flag){
                             item_total_flag = false
                             receipt_line.accounting_information.item_total = NumericalExtraction(line.text)
-                            txt = "-#{receipt_line.accounting_information.item_total}"
+                            txt = "-#{accounting_information.item_total}"
                         }
                         else {
                             new_item.subtotal = NumericalExtraction(line.text)
                             new_item.is_reduced_tax_rate =  line.text.suffix(1) == "軽"
-                            txt = "¥#{receipt_line.item_infotmation.items[\(element_count)].subtotal}#{receipt_line.item_infotmation.items[\(element_count)].is_reduced_tax_rate?`軽`:``}"
+                            txt = "¥#{item_infotmation.items[\(element_count)].subtotal}#{item_infotmation.items[\(element_count)].is_reduced_tax_rate?`軽`:``}"
                         }
 
                         if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
@@ -447,7 +469,7 @@ struct CameraView: View {
                         }
                         else {
                             receipt_line.accounting_information.total_sum = NumericalExtraction(line.text)
-                            txt = "¥#{receipt_line.accounting_information.total_sum}"
+                            txt = "¥#{accounting_information.total_sum}"
                             processing_status += 1
                         }
                         if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
@@ -457,7 +479,11 @@ struct CameraView: View {
                             line_text += double_angle_text + txt + " |"
                         }
                     case FM_status.accounting.rawValue:
-                        if line.text.contains("10%対象") && j == 0 {
+                        if line.text.contains("軽減税率対象") {
+                            processing_status = FM_status.finish.rawValue
+                            txt = line.text
+                        }
+                        else if line.text.contains("10%対象") && j == 0 {
                             total_sum_10_flag = true
                             txt = line.text
                         }
@@ -469,12 +495,26 @@ struct CameraView: View {
                             internal_consumption_tex_flag = true
                             txt = line.text
                         }
-                        else if line.text.contains("支払") && j == 0 {
+                        else if line.text.suffix(2) == "支払" && j == 0 {
                             payment_flag = true
                             element_count += 1
                             new_payment = PaymentMethod(element_count)
-                            getPatmentName(text: line.text, payment: &new_payment)
-                            txt = "#{receipt_line.payment_information.payment_methods[\(element_count)].name}支払"
+                            getPaymentName(text: line.text, payment: &new_payment)
+                            txt = "#{payment_information.payment_methods[\(element_count)].name}支払"
+                        }
+                        else if line.text.suffix(2) == "利用" && j == 0 {
+                            payment_flag = true
+                            element_count += 1
+                            new_payment = PaymentMethod(element_count)
+                            getPaymentName2(text: line.text, payment: &new_payment)
+                            txt = "#{payment_information.payment_methods[\(element_count)].name}利用"
+                        }
+                        else if line.text == "クレジットiD" && j == 0 {
+                            payment_flag = true
+                            element_count += 1
+                            new_payment = PaymentMethod(element_count)
+                            new_payment.name = line.text
+                            txt = "#{payment_information.payment_methods[\(element_count)].name}"
                         }
                         else if line.text.contains("釣") {
                             change_flag = true
@@ -487,38 +527,38 @@ struct CameraView: View {
                         else if internal_consumption_tex_flag && j == 1 {
                             internal_consumption_tex_flag = false
                             receipt_line.accounting_information.internal_consumption_tex = NumericalExtraction(line.text)
-                            txt = "¥#{receipt_line.accounting_information.internal_consumption_tex}"
+                            txt = "¥#{accounting_information.internal_consumption_tex}"
                         }
                         else if total_sum_8_flag && j == 1 {
                             total_sum_8_flag = false
                             receipt_line.accounting_information.total_sum_8 = NumericalExtraction(line.text)
-                            txt = "¥#{receipt_line.accounting_information.total_sum_8}"
+                            txt = "¥#{accounting_information.total_sum_8}"
                         }
                         else if total_sum_10_flag && j == 1 {
                             total_sum_10_flag = false
                             receipt_line.accounting_information.total_sum_10 = NumericalExtraction(line.text)
-                            txt = "¥#{receipt_line.accounting_information.total_sum_10}"
+                            txt = "¥#{accounting_information.total_sum_10}"
                         }
                         else if payment_flag && j == 1 {
                             payment_flag = false
                             new_payment.paid = NumericalExtraction(line.text)
-                            txt = "¥#{receipt_line.payment_information.payment_methods[\(element_count)].paid}"
+                            txt = "¥#{payment_information.payment_methods[\(element_count)].paid}"
                             if(new_payment.id != -1){
                                 receipt_line.payment_information.payment_methods.append(new_payment)
                                 receipt_line.payment_information.count = element_count + 1
                             }
 //                            receipt_line.accounting_information.payment = NumericalExtraction(line.text)
-//                            txt = "-#{receipt_line.accounting_information.payment}"
+//                            txt = "-#{accounting_information.payment}"
                         }
                         else if change_flag && j == g_lines.count - 1 {
                             change_flag = false
                             receipt_line.payment_information.change = NumericalExtraction(line.text)
-                            txt = "¥#{receipt_line.payment_information.change}"
+                            txt = "¥#{payment_information.change}"
                         }
                         else if deposit_flag && j == g_lines.count - 1 {
                             deposit_flag = false
                             receipt_line.payment_information.deposit = NumericalExtraction(line.text)
-                            txt = "¥#{receipt_line.payment_information.deposit}"
+                            txt = "¥#{payment_information.deposit}"
                         }
                         else {
                             txt = line.text
@@ -586,7 +626,7 @@ struct CameraView: View {
     }
     
     func isDateTime(text: String) -> Bool {
-        let pattern = #"[0-9]{4}年\s*\d{1,2}月\s*\d{1,2}日\(.\)\s*\d{1,2}:\s*\d{1,2}"#
+        let pattern = #"[0-9]{4}年\s*\d{1,2}月\s*\d{1,2}日\s*\(.\)\s*\d{1,2}:\s*\d{1,2}"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return false }
         let checkingResults = regex.matches(in: text, range: NSRange(location: 0, length: text.count))
         return checkingResults.count > 0
@@ -620,6 +660,36 @@ struct CameraView: View {
         return checkingResults.count > 0
     }
     
+    func isUnitPrice(text: String) -> Bool {
+        let pattern = #"^@(\d*)(×|x)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return false }
+        let checkingResults = regex.matches(in: text, range: NSRange(location: 0, length: text.count))
+        return checkingResults.count > 0
+    }
+    
+    func getUnitPrice(text: String, item: inout Item) {
+        let pattern = #"^@(\d*)(×|x)"#
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
+            item.unit_price = Int(NSString(string: text).substring(with: r!.range(at: 1)))!
+        }
+    }
+    
+    func isQuantity(text: String) -> Bool {
+        let pattern = #"\s*(\d*)点"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return false }
+        let checkingResults = regex.matches(in: text, range: NSRange(location: 0, length: text.count))
+        return checkingResults.count > 0
+    }
+    
+    func getQuantity(text: String, item: inout Item) {
+        let pattern = #"\s*(\d*)点"#
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
+            item.quantity = Int(NSString(string: text).substring(with: r!.range(at: 1)))!
+        }
+    }
+    
     func getMultiple(text: String, item: inout Item) {
         let pattern = #"^@(\d*)(×|x)\s*(\d*)点"#
         if let regex = try? NSRegularExpression(pattern: pattern) {
@@ -629,7 +699,7 @@ struct CameraView: View {
         }
     }
     
-    func getPatmentName(text: String, payment: inout PaymentMethod) {
+    func getPaymentName(text: String, payment: inout PaymentMethod) {
         let pattern = #"(.*)(支払)$"#
         if let regex = try? NSRegularExpression(pattern: pattern) {
             let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
@@ -637,8 +707,16 @@ struct CameraView: View {
         }
     }
     
+    func getPaymentName2(text: String, payment: inout PaymentMethod) {
+        let pattern = #"(.*)(利用)$"#
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
+            payment.name = NSString(string: text).substring(with: r!.range(at: 1))
+        }
+    }
+    
     func getDayTime(text: String) -> DayTime {
-        let pattern = #"(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日\((.)\)\s*(\d{1,2}):\s*(\d{1,2})"#
+        let pattern = #"(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日\s*\((.)\)\s*(\d{1,2}):\s*(\d{1,2})"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return DayTime() }
         let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
         let daytime = DayTime()

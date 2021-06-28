@@ -47,26 +47,6 @@ struct CreateReceiptView: View {
                     ShowingButton(flag: $showAllStoreInformation)
                 }
                 
-                Section(header: Text("レジ情報")){
-
-                    if showAllRegisterInformation {
-                        FormElement(variable: $receipt_line.register_information.register_number, placeholder: "0-0000", labelText: "レジ番号")
-                        FormElement(variable: $receipt_line.register_information.responsibily_number, placeholder: "000", labelText: "責任番号")
-                    }
-                    ShowingButton(flag: $showAllRegisterInformation)
-                }
-                
-                Section(header: Text("商品情報(計\(receipt_line.item_information.count)個)")){
-                    ForEach(0..<receipt_line.item_information.count) { i in
-                        Button(action:{
-                            edittingItemId = i
-                            isEdittingItem = true
-                        }){
-                            ElementRow(title: receipt_line.item_information.items[i].name, text: "¥\(receipt_line.item_information.items[i].subtotal)")
-                        }
-                    }
-                }
-                
                 Section(header: Text("支払い情報")){
                     NumberFormElement(variable: $receipt_line.accounting_information.total_sum, labelText: "合計")
                     if showAllAccountingInformation {
@@ -80,9 +60,33 @@ struct CreateReceiptView: View {
                     ShowingButton(flag: $showAllAccountingInformation)
                 }
                 
+                
+                
+                Section(header: Text("商品情報(計\(receipt_line.item_information.count)個)")){
+                    ForEach(0..<receipt_line.item_information.count) { i in
+                        Button(action:{
+                            edittingItemId = i
+                            isEdittingItem = true
+                        }){
+                            ElementRow(title: receipt_line.item_information.items[i].name, text: "¥\(receipt_line.item_information.items[i].subtotal)")
+                        }
+                    }
+                }
+                
+                Section(header: Text("レジ情報")){
+
+                    if showAllRegisterInformation {
+                        FormElement(variable: $receipt_line.register_information.register_number, placeholder: "0-0000", labelText: "レジ番号")
+                        FormElement(variable: $receipt_line.register_information.responsibily_number, placeholder: "000", labelText: "責任番号")
+                    }
+                    ShowingButton(flag: $showAllRegisterInformation)
+                }
+                
                 Section(header: Text("決済情報(計\(receipt_line.payment_information.count)個)")){
                     
                     if showAllPaymentInformation {
+                        NumberFormElement(variable: $receipt_line.payment_information.deposit, labelText: "お預かり")
+                        NumberFormElement(variable: $receipt_line.payment_information.change, labelText: "お釣り")
                         ForEach(0..<receipt_line.payment_information.count) { i in
                             ElementRow(title: receipt_line.payment_information.payment_methods[i].name, text: "¥\(receipt_line.payment_information.payment_methods[i].paid)")
                         }
@@ -196,8 +200,9 @@ struct DayTimeForm: View {
             VStack {
                 Spacer()
                 Form {
-                    DatePicker("購入日　:", selection: $date)
+                    DatePicker("購入日　:", selection: $date, in: ...Date())
                         .datePickerStyle(WheelDatePickerStyle())
+                        
                 }
                 .onChange(of: date, perform: { value in
                     convertFromDateToDayTime()

@@ -16,20 +16,20 @@ struct ListView: View {
     @State var values: [[ReceiptLine]] = []
     var body: some View {
             List {
-                ForEach(0..<keys.count, id: \.self) { i in
-                    Section(header: SectionHeaderView(key: keys[i], receipt_lines: $receipt_lines)) {
-                        ForEach(0..<values[i].count, id: \.self) { j in
+                ForEach(keys, id: \.self) { key in
+                    Section(header: SectionHeaderView(key: key, receipt_lines: $receipt_lines)) {
+                        ForEach(0..<(receipt_lines[key] == nil ? 0 : receipt_lines[key]!.count), id: \.self) { j in
 //                            Text(getStringDate(receipt_line: (receipt_lines[keys[i]]?[j])!))
-                            ListRaw(receipt_line: (receipt_lines[keys[i]]?[j])!, status: $status, edit_receipt_line: $receipt_line)
+                            ListRaw(receipt_line: receipt_lines[key]?[j] ?? ReceiptLine(), status: $status, edit_receipt_line: $receipt_line)
                         }
                         .onDelete(perform: { indexSet in
-                            let uuid = values[i][indexSet.first!].uuid.uuidString
+                            let uuid = receipt_lines[key]?[indexSet.first!].uuid.uuidString
                             let fileManager = FileManager.default
                             let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
-                            let path = docs.appendingPathComponent(uuid + ".xml")
+                            let path = docs.appendingPathComponent(uuid! + ".xml")
                             do {
                                 try FileManager.default.removeItem(at: path)
-                                self.userData.load_receipt_lines()
+                                userData.load_receipt_lines()
                                 setReceiptLineDictionary()
                             } catch {
                                 print(error)
@@ -40,8 +40,12 @@ struct ListView: View {
             }
             .frame(maxWidth: .infinity)
             .onAppear{
+                userData.load_receipt_lines()
                 setReceiptLineDictionary()
             }
+            .onChange(of: userData.receipt_lines.count, perform: { value in
+                setReceiptLineDictionary()
+            })
     }
     
     func getStringDate(receipt_line: ReceiptLine) -> String {
@@ -77,8 +81,9 @@ struct ListView: View {
 }
 
 struct SectionHeaderView: View {
-    let key: String
+    var key: String
     @State var dateString: String = ""
+    @EnvironmentObject var userData: UserData
     @Binding var receipt_lines: [String: [ReceiptLine]]
     @State var cnt = 0
     var body: some View {
@@ -88,21 +93,38 @@ struct SectionHeaderView: View {
             Text("(計: ¥\(cnt))")
                 .padding(.trailing, 25)
         }
+        .onChange(of: userData.receipt_lines.count, perform: { value in
+            updateHeader()
+        })
         .onAppear{
-            cnt = 0
+            updateHeader()
+        }
+        
+    }
+    
+    func updateHeader() {
+        cnt = 0
+        if receipt_lines[key] != nil {
             for receipt_line in receipt_lines[key]! {
                 cnt += receipt_line.accounting_information.total_sum
             }
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale(identifier: "ja_JP")
-            dateFormatter.dateFormat = "yyyy"
-            dateFormatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
-            if key.prefix(4) ==  dateFormatter.string(from: Date()) {
-                dateString = String(key.suffix(5))
+        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "ja_JP")
+        dateFormatter.dateFormat = "yyyy"
+        dateFormatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
+        if key.prefix(4) ==  dateFormatter.string(from: Date()) {
+            dateString = String(key.suffix(5))
+            dateFormatter.dateFormat = "yyyy/MM/dd"
+            if dateFormatter.string(from: Date()) == key {
+                dateString = "今日"
             }
-            else {
-                dateString = key
+            else if dateFormatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!) == key {
+                dateString = "昨日"
             }
+        }
+        else {
+            dateString = key
         }
     }
 }

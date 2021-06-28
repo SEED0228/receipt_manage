@@ -264,8 +264,8 @@
 		03ADC365261EFCF600786199 = {
 			isa = PBXGroup;
 			children = (
-				0364A6852686E22700648088 /* Models */,
 				0364A6842686E1F900648088 /* Views */,
+				0364A6852686E22700648088 /* Models */,
 				0314E8DB26293C4000FA282D /* sample.png */,
 				0314E8BA2629324600FA282D /* GoogleService-Info.plist */,
 				035627CE262813670062109B /* tessdata */,
