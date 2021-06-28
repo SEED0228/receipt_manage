@@ -15,8 +15,8 @@ struct Receipt:Identifiable, Equatable, Codable {
     var total_price: Int
     var is_selected: Bool = false // for selecting receipts
     var is_deleted: Bool = false
-    var items: [Item] = []
-    init(store_name: String, date: Date, total_price: Int, items: [Item]){
+    var items: [Display_Item] = []
+    init(store_name: String, date: Date, total_price: Int, items: [Display_Item]){
         self.store_name = store_name
         self.date = date
         self.total_price = total_price
@@ -29,7 +29,7 @@ struct Receipt:Identifiable, Equatable, Codable {
     }
 }
 
-struct Item:Identifiable, Equatable, Codable{
+struct Display_Item:Identifiable, Equatable, Codable{
     var id = UUID()
     var name: String
     var price: Int

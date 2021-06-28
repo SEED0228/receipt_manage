@@ -3,17 +3,39 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0309CA64267137A8007E7F39 /* ReceiptLineStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0309CA63267137A8007E7F39 /* ReceiptLineStruct.swift */; };
 		0314E8BB2629324600FA282D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0314E8BA2629324600FA282D /* GoogleService-Info.plist */; };
 		0314E8DC26293C4000FA282D /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = 0314E8DB26293C4000FA282D /* sample.png */; };
 		0330298D2620420A00CF982E /* ReceiptForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0330298C2620420A00CF982E /* ReceiptForm.swift */; };
 		0330299B2620751C00CF982E /* ItemListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0330299A2620751C00CF982E /* ItemListRow.swift */; };
+		033DCA172689B017000B93BF /* PartialSheet in Frameworks */ = {isa = PBXBuildFile; productRef = 033DCA162689B017000B93BF /* PartialSheet */; };
+		033DCA1B2689DC4F000B93BF /* CreateReceiptHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033DCA1A2689DC4F000B93BF /* CreateReceiptHeaderView.swift */; };
+		033DCA20268A07A8000B93BF /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033DCA1F268A07A8000B93BF /* ListView.swift */; };
+		033DCA22268A1E9C000B93BF /* ListRaw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033DCA21268A1E9C000B93BF /* ListRaw.swift */; };
+		033DCA24268A355C000B93BF /* ListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033DCA23268A355C000B93BF /* ListContentView.swift */; };
 		035627CF262813670062109B /* tessdata in Resources */ = {isa = PBXBuildFile; fileRef = 035627CE262813670062109B /* tessdata */; };
 		035627E1262848BA0062109B /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035627E0262848BA0062109B /* ImagePicker.swift */; };
 		035627F32628A3F90062109B /* ScanDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035627F22628A3F90062109B /* ScanDocumentView.swift */; };
+		0364A6832686E01600648088 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A6822686E01600648088 /* HomeView.swift */; };
+		0364A6882686E36100648088 /* ExpenditureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A6872686E36100648088 /* ExpenditureView.swift */; };
+		0364A68A2686F0AF00648088 /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A6892686F0AF00648088 /* PageViewController.swift */; };
+		0364A68C2686F12D00648088 /* PageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A68B2686F12D00648088 /* PageView.swift */; };
+		0364A68E2686F14300648088 /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A68D2686F14300648088 /* PageControl.swift */; };
+		0364A6912687040700648088 /* MonthExpenditureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A6902687040700648088 /* MonthExpenditureView.swift */; };
+		0364A69426870CAD00648088 /* ContentView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A69326870CAD00648088 /* ContentView2.swift */; };
+		0364A69626870D1200648088 /* CameraScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A69526870D1200648088 /* CameraScanView.swift */; };
+		0364A698268715D300648088 /* CameraScanHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A697268715D300648088 /* CameraScanHeaderView.swift */; };
+		0364A69A2687248000648088 /* CameraSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A6992687248000648088 /* CameraSelectView.swift */; };
+		0364A69C2687275F00648088 /* CameraSelectHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A69B2687275F00648088 /* CameraSelectHeaderView.swift */; };
+		0364A69E2687348D00648088 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A69D2687348D00648088 /* CameraView.swift */; };
+		0364A6A026874F3800648088 /* SelectImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A69F26874F3800648088 /* SelectImageView.swift */; };
+		0364A6A22687561B00648088 /* ImageCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A6A12687561B00648088 /* ImageCard.swift */; };
+		0364A6A426876D9500648088 /* CreateReceiptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A6A326876D9500648088 /* CreateReceiptView.swift */; };
+		0364A6AA26877E1500648088 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0364A6A926877E1500648088 /* Status.swift */; };
 		036F8F0C2639814D003D8815 /* receipt_manageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03ADC36B261EFCF600786199 /* receipt_manageApp.swift */; };
 		03ADC387261EFCF600786199 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03ADC386261EFCF600786199 /* Tests_iOS.swift */; };
 		03ADC392261EFCF600786199 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03ADC391261EFCF600786199 /* Tests_macOS.swift */; };
@@ -46,13 +68,34 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0309CA63267137A8007E7F39 /* ReceiptLineStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptLineStruct.swift; sourceTree = "<group>"; };
 		0314E8BA2629324600FA282D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0314E8DB26293C4000FA282D /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample.png; sourceTree = "<group>"; };
 		0330298C2620420A00CF982E /* ReceiptForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptForm.swift; sourceTree = "<group>"; };
 		0330299A2620751C00CF982E /* ItemListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListRow.swift; sourceTree = "<group>"; };
+		033DCA1A2689DC4F000B93BF /* CreateReceiptHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateReceiptHeaderView.swift; sourceTree = "<group>"; };
+		033DCA1F268A07A8000B93BF /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
+		033DCA21268A1E9C000B93BF /* ListRaw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ListRaw.swift; path = /Users/seed/swift/receipt_manage/Views/List/ListRaw.swift; sourceTree = "<absolute>"; };
+		033DCA23268A355C000B93BF /* ListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContentView.swift; sourceTree = "<group>"; };
 		035627CE262813670062109B /* tessdata */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tessdata; sourceTree = "<group>"; };
 		035627E0262848BA0062109B /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		035627F22628A3F90062109B /* ScanDocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDocumentView.swift; sourceTree = "<group>"; };
+		0364A6822686E01600648088 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		0364A6872686E36100648088 /* ExpenditureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenditureView.swift; sourceTree = "<group>"; };
+		0364A6892686F0AF00648088 /* PageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
+		0364A68B2686F12D00648088 /* PageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageView.swift; sourceTree = "<group>"; };
+		0364A68D2686F14300648088 /* PageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageControl.swift; sourceTree = "<group>"; };
+		0364A6902687040700648088 /* MonthExpenditureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthExpenditureView.swift; sourceTree = "<group>"; };
+		0364A69326870CAD00648088 /* ContentView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView2.swift; sourceTree = "<group>"; };
+		0364A69526870D1200648088 /* CameraScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraScanView.swift; sourceTree = "<group>"; };
+		0364A697268715D300648088 /* CameraScanHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraScanHeaderView.swift; sourceTree = "<group>"; };
+		0364A6992687248000648088 /* CameraSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSelectView.swift; sourceTree = "<group>"; };
+		0364A69B2687275F00648088 /* CameraSelectHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSelectHeaderView.swift; sourceTree = "<group>"; };
+		0364A69D2687348D00648088 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		0364A69F26874F3800648088 /* SelectImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectImageView.swift; sourceTree = "<group>"; };
+		0364A6A12687561B00648088 /* ImageCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCard.swift; sourceTree = "<group>"; };
+		0364A6A326876D9500648088 /* CreateReceiptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateReceiptView.swift; sourceTree = "<group>"; };
+		0364A6A926877E1500648088 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Status.swift; path = Views/Status.swift; sourceTree = SOURCE_ROOT; };
 		03ADC36B261EFCF600786199 /* receipt_manageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = receipt_manageApp.swift; sourceTree = "<group>"; };
 		03ADC36C261EFCF600786199 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		03ADC36D261EFCF600786199 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -83,6 +126,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				033DCA172689B017000B93BF /* PartialSheet in Frameworks */,
 				9FF3C82D2B3F777DCE8F59BE /* Pods_receipt_manage__iOS_.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -112,19 +156,119 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		033DCA1E2689E712000B93BF /* List */ = {
+			isa = PBXGroup;
+			children = (
+				033DCA21268A1E9C000B93BF /* ListRaw.swift */,
+				033DCA1F268A07A8000B93BF /* ListView.swift */,
+				033DCA23268A355C000B93BF /* ListContentView.swift */,
+			);
+			path = List;
+			sourceTree = "<group>";
+		};
+		0364A6842686E1F900648088 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				033DCA1E2689E712000B93BF /* List */,
+				0364A6A826876E3900648088 /* CameraViewController */,
+				0364A6A726876DD600648088 /* CameraScan */,
+				0364A6A626876DCC00648088 /* CameraSelect */,
+				0364A6A526876DA200648088 /* Camera */,
+				0364A6922687074200648088 /* CreateReceipt */,
+				0364A68F2686FB7200648088 /* Page */,
+				0364A6862686E26100648088 /* Home */,
+				03ADC3AC261F038F00786199 /* ReceiptListRow.swift */,
+				0330299A2620751C00CF982E /* ItemListRow.swift */,
+				0330298C2620420A00CF982E /* ReceiptForm.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		0364A6852686E22700648088 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0364A6A926877E1500648088 /* Status.swift */,
+				03ADC3B2261F25B500786199 /* UserData.swift */,
+				03ADC3BC261F27C300786199 /* UserReceipt.swift */,
+				0309CA63267137A8007E7F39 /* ReceiptLineStruct.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		0364A6862686E26100648088 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				0364A6822686E01600648088 /* HomeView.swift */,
+				0364A6872686E36100648088 /* ExpenditureView.swift */,
+				0364A6902687040700648088 /* MonthExpenditureView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		0364A68F2686FB7200648088 /* Page */ = {
+			isa = PBXGroup;
+			children = (
+				0364A6892686F0AF00648088 /* PageViewController.swift */,
+				0364A68B2686F12D00648088 /* PageView.swift */,
+				0364A68D2686F14300648088 /* PageControl.swift */,
+			);
+			path = Page;
+			sourceTree = "<group>";
+		};
+		0364A6922687074200648088 /* CreateReceipt */ = {
+			isa = PBXGroup;
+			children = (
+				0364A6A326876D9500648088 /* CreateReceiptView.swift */,
+				033DCA1A2689DC4F000B93BF /* CreateReceiptHeaderView.swift */,
+			);
+			path = CreateReceipt;
+			sourceTree = "<group>";
+		};
+		0364A6A526876DA200648088 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				0364A69D2687348D00648088 /* CameraView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		0364A6A626876DCC00648088 /* CameraSelect */ = {
+			isa = PBXGroup;
+			children = (
+				0364A6992687248000648088 /* CameraSelectView.swift */,
+				0364A69B2687275F00648088 /* CameraSelectHeaderView.swift */,
+			);
+			path = CameraSelect;
+			sourceTree = "<group>";
+		};
+		0364A6A726876DD600648088 /* CameraScan */ = {
+			isa = PBXGroup;
+			children = (
+				0364A69526870D1200648088 /* CameraScanView.swift */,
+				0364A697268715D300648088 /* CameraScanHeaderView.swift */,
+				0364A69F26874F3800648088 /* SelectImageView.swift */,
+				0364A6A12687561B00648088 /* ImageCard.swift */,
+			);
+			path = CameraScan;
+			sourceTree = "<group>";
+		};
+		0364A6A826876E3900648088 /* CameraViewController */ = {
+			isa = PBXGroup;
+			children = (
+				035627E0262848BA0062109B /* ImagePicker.swift */,
+				035627F22628A3F90062109B /* ScanDocumentView.swift */,
+			);
+			path = CameraViewController;
+			sourceTree = "<group>";
+		};
 		03ADC365261EFCF600786199 = {
 			isa = PBXGroup;
 			children = (
+				0364A6842686E1F900648088 /* Views */,
+				0364A6852686E22700648088 /* Models */,
 				0314E8DB26293C4000FA282D /* sample.png */,
 				0314E8BA2629324600FA282D /* GoogleService-Info.plist */,
 				035627CE262813670062109B /* tessdata */,
-				03ADC3AC261F038F00786199 /* ReceiptListRow.swift */,
-				03ADC3BC261F27C300786199 /* UserReceipt.swift */,
-				0330298C2620420A00CF982E /* ReceiptForm.swift */,
-				0330299A2620751C00CF982E /* ItemListRow.swift */,
-				035627E0262848BA0062109B /* ImagePicker.swift */,
-				035627F22628A3F90062109B /* ScanDocumentView.swift */,
-				03ADC3B2261F25B500786199 /* UserData.swift */,
 				03ADC36A261EFCF600786199 /* Shared */,
 				03ADC374261EFCF600786199 /* iOS */,
 				03ADC37B261EFCF600786199 /* macOS */,
@@ -141,6 +285,7 @@
 			children = (
 				03ADC36B261EFCF600786199 /* receipt_manageApp.swift */,
 				03ADC36C261EFCF600786199 /* ContentView.swift */,
+				0364A69326870CAD00648088 /* ContentView2.swift */,
 				03ADC36D261EFCF600786199 /* Assets.xcassets */,
 			);
 			path = Shared;
@@ -231,6 +376,9 @@
 			dependencies = (
 			);
 			name = "receipt_manage (iOS)";
+			packageProductDependencies = (
+				033DCA162689B017000B93BF /* PartialSheet */,
+			);
 			productName = "receipt_manage (iOS)";
 			productReference = 03ADC372261EFCF600786199 /* receipt_manage.app */;
 			productType = "com.apple.product-type.application";
@@ -323,6 +471,9 @@
 				Base,
 			);
 			mainGroup = 03ADC365261EFCF600786199;
+			packageReferences = (
+				033DCA152689B017000B93BF /* XCRemoteSwiftPackageReference "PartialSheet" */,
+			);
 			productRefGroup = 03ADC373261EFCF600786199 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -457,15 +608,36 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				033DCA1B2689DC4F000B93BF /* CreateReceiptHeaderView.swift in Sources */,
+				0364A6A426876D9500648088 /* CreateReceiptView.swift in Sources */,
 				0330299B2620751C00CF982E /* ItemListRow.swift in Sources */,
+				0364A69A2687248000648088 /* CameraSelectView.swift in Sources */,
+				0364A6A026874F3800648088 /* SelectImageView.swift in Sources */,
+				0364A698268715D300648088 /* CameraScanHeaderView.swift in Sources */,
+				0309CA64267137A8007E7F39 /* ReceiptLineStruct.swift in Sources */,
 				03ADC396261EFCF600786199 /* ContentView.swift in Sources */,
+				0364A69626870D1200648088 /* CameraScanView.swift in Sources */,
+				0364A6A22687561B00648088 /* ImageCard.swift in Sources */,
+				0364A6AA26877E1500648088 /* Status.swift in Sources */,
+				0364A6912687040700648088 /* MonthExpenditureView.swift in Sources */,
+				033DCA22268A1E9C000B93BF /* ListRaw.swift in Sources */,
+				0364A69E2687348D00648088 /* CameraView.swift in Sources */,
 				03ADC3BD261F27C300786199 /* UserReceipt.swift in Sources */,
 				0330298D2620420A00CF982E /* ReceiptForm.swift in Sources */,
+				0364A69426870CAD00648088 /* ContentView2.swift in Sources */,
+				0364A68E2686F14300648088 /* PageControl.swift in Sources */,
+				0364A69C2687275F00648088 /* CameraSelectHeaderView.swift in Sources */,
+				0364A6832686E01600648088 /* HomeView.swift in Sources */,
 				035627F32628A3F90062109B /* ScanDocumentView.swift in Sources */,
 				03ADC394261EFCF600786199 /* receipt_manageApp.swift in Sources */,
+				0364A6882686E36100648088 /* ExpenditureView.swift in Sources */,
 				035627E1262848BA0062109B /* ImagePicker.swift in Sources */,
+				033DCA24268A355C000B93BF /* ListContentView.swift in Sources */,
+				0364A68A2686F0AF00648088 /* PageViewController.swift in Sources */,
+				033DCA20268A07A8000B93BF /* ListView.swift in Sources */,
 				03ADC3B3261F25B500786199 /* UserData.swift in Sources */,
 				03ADC3AD261F038F00786199 /* ReceiptListRow.swift in Sources */,
+				0364A68C2686F12D00648088 /* PageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -856,6 +1028,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		033DCA152689B017000B93BF /* XCRemoteSwiftPackageReference "PartialSheet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:AndreaMiotto/PartialSheet.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		033DCA162689B017000B93BF /* PartialSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 033DCA152689B017000B93BF /* XCRemoteSwiftPackageReference "PartialSheet" */;
+			productName = PartialSheet;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 03ADC366261EFCF600786199 /* Project object */;
 }
