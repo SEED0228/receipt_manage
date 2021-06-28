@@ -13,6 +13,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
     
     @Binding var selectedImage: UIImage?
+    @Binding var status: Status
     @Environment(\.presentationMode) private var presentationMode
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
@@ -45,9 +46,13 @@ struct ImagePicker: UIViewControllerRepresentable {
             
             if let image = info[.originalImage] as? UIImage {
                 parent.selectedImage = image
+                parent.status = Status.home
             }
             
             parent.presentationMode.wrappedValue.dismiss()
+        }
+        func imagePickerControllerDidCancel(_ controller: UIImagePickerController){
+            parent.status = Status.home
         }
     }
 }

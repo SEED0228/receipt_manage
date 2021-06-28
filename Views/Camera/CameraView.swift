@@ -1,339 +1,59 @@
 //
-//  ReceiptForm.swift
+//  CameraView.swift
 //  receipt_manage (iOS)
 //
-//  Created by 多根直輝 on 2021/04/09.
+//  Created by 多根直輝 on 2021/06/26.
 //
-import UIKit
+
 import SwiftUI
+import UIKit
 import SwiftyTesseract
 import Firebase
+import XMLMapper
 
-struct ReceiptForm: View {
-    // 状態
-    enum FM_status: Int {
-        case branch = 0
-        case address = 1
-        case daytime = 2
-        case registration = 3
-        case item = 4
-        case total_price = 5
-        case accounting = 6
-        case payment = 7
-    }
-    // レシートフォーム用変数
-    @State var date = Date()
-    @State var store_name = ""
-    @State var total_price = ""
-    @State var items: [Display_Item] = []
-    // レシートの商品用変数
-    @State var new_item = Display_Item()
-    @State var selected_item_id = UUID()
-    // レシートリストに反映する用
-    @EnvironmentObject var userData: UserData
-    // リスト画面に戻る用
-    @Environment(\.presentationMode) var presentationMode
-    // 画像取得用
-    @State var showingImagePicker = true
-    @State var showingReceiptForm = false
-    @State private var image: UIImage?
-    @State var inPhotoLibrary: Bool? = nil
+
+struct CameraView: View {
+    
+    @State var status: Status = .home
+    @State var scanned_images: [UIImage]?
+    @State private var selected_image: UIImage?
+    @State var receipt_line: ReceiptLine = ReceiptLine()
+    @State var processing: Bool = false
+    
     
     var body: some View {
-        if showingReceiptForm {
-            Form {
-                HStack {
-                    Text("店名　　:")
-                    TextField("入力してください", text: $store_name)
-                }
-                DatePicker("購入日　:", selection: $date)
-                    .datePickerStyle(WheelDatePickerStyle())
-            
-                ForEach(items) { item in
-                    if selected_item_id != item.id {
-                        Button(action: {selectItem(item: item)})
-                        {
-                            HStack() {
-                                Spacer()
-                                if item.name == "" {
-                                    Text("タップで新規商品を登録")
-                                        .foregroundColor(.gray)
-                                        .font(.system(size: 12))
-                                }
-                                else {
-                                    Text(item.name)
-                                    Text("¥\(item.price)")
-                                }
-                                Spacer()
-                            }
-                        }
-                    }
-                    else {
-                        HStack {
-                            TextField("商品名", text: $new_item.name)
-                            TextField("0", value: $new_item.price, formatter: NumberFormatter())
-                        }
-                        
-                    }
-                    
-                }
-                
-                Button(action: {addItem()})
-                {
-                    HStack {
-                        Spacer()
-                        Text("商品追加")
-                            .foregroundColor(.orange)
-                            .font(.system(size: 12))
-                        Spacer()
-                    }
-                }
-            
-                HStack {
-                    Text("合計金額:")
-                    TextField("0", text: $total_price).keyboardType(.numberPad)
-                }
-                
-                Button(action: {createReceipt()})
-                {
-                    HStack {
-                        Spacer()
-                        Text("保存")
-                            .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                        Spacer()
-                    }
-                   
-                }
+        ZStack {
+            switch status {
+            case Status.home:
+                CameraSelectView(status: $status, receipt_line: $receipt_line)
+            case Status.scan:
+                CameraScanView(status: $status, scanned_images: $scanned_images)
+            case Status.selectImages:
+                SelectImageView(scanned_images: $scanned_images, selected_image: $selected_image, status: $status)
+            case Status.photoLibrary:
+                ImagePicker(sourceType: .photoLibrary, selectedImage: $selected_image, status: $status)
+            case Status.createReceiptLine:
+                CreateReceiptView(receipt_line: $receipt_line, status: $status)
+            default:
+                CameraSelectView(status: $status, receipt_line: $receipt_line)
             }
-            
-        }
-        else if inPhotoLibrary == nil {
-            Form {
-                Button(action: {
-                    inPhotoLibrary = true
-                })
-                {
-                    HStack {
-                        Spacer()
-                        Text("フォトライブラリから")
-                        Spacer()
-                    }
-                    
-                }
-                Button(action: {
-                    inPhotoLibrary = false
-                })
-                {
-                    HStack {
-                        Spacer()
-                        Text("カメラから")
-                        Spacer()
-                    }
-                    
-                }
-                Button(action: {
-                    showingReceiptForm = true
-                })
-                {
-                    HStack {
-                        Spacer()
-                        Text("画像なし")
-                        Spacer()
-                    }
-                    
-                }
+            if selected_image != nil {
+                Color.black
+                    .opacity(0.6)
+                    .edgesIgnoringSafeArea(.all)
+                    .onAppear{getReceiptInformation()}
             }
-        }
-        else {
-            VStack {
-                if let selectedImage = image {
-                    GeometryReader { geometry in
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Image(uiImage: selectedImage)
-                                    .resizable()
-                                    .frame(width: geometry.size.width / 2, height: geometry.size.height / 2, alignment: .center)
-                                Spacer()
-                            }
-                            Form {
-                                Button(action: {
-                                    showingReceiptForm = true
-                                    getReceiptInformation2() //////////////////////////////////////////////
-                                    
-                                })
-                                {
-                                    HStack {
-                                        Spacer()
-                                        Text("確認")
-                                        Spacer()
-                                    }
-                                }
-                                Button(action: {
-                                    inPhotoLibrary = nil
-                                })
-                                {
-                                    HStack {
-                                        Spacer()
-                                        Text("戻る")
-                                        Spacer()
-                                    }
-                                }
-                            }
-                            
-                            Spacer()
-                        }
-                        
-                    }
-                }
-                else {
-                    Button(action: {
-                        inPhotoLibrary = nil
-                        showingImagePicker = true
-                    })
-                    {
-                        Text("画像が選択されていません")
-                    }
-                }
-            }
-            .sheet(isPresented: $showingImagePicker) {
-                if inPhotoLibrary! {
-                    ImagePicker(sourceType: .photoLibrary, selectedImage: $image)
-                }
-                else {
-                    //ImagePicker(sourceType: .camera, selectedImage: $image)
-                    ScanDocumentView(selectedImage: $image)
-                }
-                
-            }
-        }
-        
-    }
-    // レシート新規作成用
-    func createReceipt() {
-        save_item()
-        let newReceipt = Receipt(store_name: self.store_name, date: self.date, total_price: Int(self.total_price)!, items: self.items)
-        
-        self.userData.receipts.insert(newReceipt, at: 0)
-        saveReceiptsToDevise()
-
-        if presentationMode.wrappedValue.isPresented {
-            presentationMode.wrappedValue.dismiss() //close this view
-        }
-    }
-    // 編集する商品を選択する用
-    func selectItem(item: Display_Item) {
-        save_item()
-        new_item = Display_Item()
-        selected_item_id = item.id
-        new_item = item
-    }
-    // 新規商品の追加
-    func addItem() {
-        items.append(Display_Item())
-    }
-    // 編集した商品を元の商品リストに保存
-    func save_item() {
-        if let index = items.firstIndex(where: {$0.id == selected_item_id}) {
-            items[index] = new_item
-        }
-    }
-    // 端末にデータを保存
-    func saveReceiptsToDevise() {
-        let data = self.userData.receipts.map { try? JSONEncoder().encode($0) }
-        UserDefaults.standard.set(data, forKey: "receipts")
-    }
-    // レシートのテキストを取得
-    func getReceiptInformation() {
-        //################### use swiftytesseract
-//        let start = Date()
-//        let swiftyTesseract = SwiftyTesseract(language: RecognitionLanguage.japanese)
-//        if let acquired_image = image {
-//            swiftyTesseract.performOCR(on: acquired_image) { recognizedString in
-//            guard let text = recognizedString else { return }
-//            print("\(text)")
-//
-//            print("\(-start.timeIntervalSinceNow)")
-//        }
-        let vision = Vision.vision()
-        let options = VisionCloudTextRecognizerOptions()
-        options.languageHints = ["en", "ja"]
-        let textRecognizer = vision.cloudTextRecognizer(options: options)
-        let visionimage = VisionImage(image: image!)
-        textRecognizer.process(visionimage) { result, error in
-          guard error == nil, let result = result else {
-            return
-          }
-            // 全文字列を取得
-            var acquired_lines: [VisionTextLine] = []
-            // 値段を記載している箇所を取得
-            var price_lines: [VisionTextLine] = []
-            // 省くものリスト（完全一致）
-            let ExactMatchOmittionList: [String] = ["外税", "外税売"]
-            // 省くものリスト（部分一致）
-            let PartialMatchOmittionList: [String] = ["値引","端数","税","小計"]
-            for block in result.blocks {
-                var cnt = 0
-                for line in block.lines {
-//                    print("word: " + line.text)
-//                    print(line.frame.origin.x)
-//                    print(line.frame.origin.y)
-                    print(String(cnt) + "," + line.text + "," + String(format: "%.01f", Float(line.frame.origin.x)) + "," + String(format: "%.01f", Float(line.frame.origin.y)) )
-                    cnt += 1
-                    if line.text.contains("¥") {
-                        price_lines.append(line)
-//                        print(line.text)
-                    }
-                    else {
-                        acquired_lines.append(line)
-                    }
-                }
-            }
-            // y座標、昇順に並び替え
-            acquired_lines = acquired_lines.sorted(by: {
-                $0.frame.origin.y < $1.frame.origin.y
-            } )
-            
-            // 先頭の文字列を店名とする
-            store_name = acquired_lines[0].text
-            price: for price_line in price_lines {
-                var min_dist:CGFloat = 10000.0
-                var name: String = ""
-                acquired: for acquired_line in acquired_lines {
-                    if min_dist > abs(acquired_line.frame.origin.y - price_line.frame.origin.y) {
-                        min_dist = abs(acquired_line.frame.origin.y - price_line.frame.origin.y)
-                        name = acquired_line.text
-                    }
-                    if price_line.frame.origin.y < acquired_line.frame.origin.y {
-                        print(name)
-                        if name == "合" || name == "計" || name == "合計" {
-                            total_price = String(NumericalExtraction(price_line.text))
-                            break price
-                        }
-                        else {
-                            for str in PartialMatchOmittionList {
-                                if name.contains(str) {
-                                    break acquired
-                                }
-                            }
-                            if ExactMatchOmittionList.firstIndex(where: {$0 == name}) == nil  {
-                                items.append(Display_Item(name: name, price: NumericalExtraction(price_line.text)))
-                            }
-                            break
-                        }
-                        
-                    }
-                }
-            }
+            ActivityIndicator(isAnimating: $processing, style: .large)
         }
     }
     
-    func getReceiptInformation2() {
+    func getReceiptInformation() {
+        self.processing = true
         let vision = Vision.vision()
         let options = VisionCloudTextRecognizerOptions()
         options.languageHints = ["en", "ja"]
         let textRecognizer = vision.cloudTextRecognizer(options: options)
-        let visionimage = VisionImage(image: image!)
+        let visionimage = VisionImage(image: selected_image!)
         textRecognizer.process(visionimage) { result, error in
           guard error == nil, let result = result else {
             return
@@ -349,6 +69,8 @@ struct ReceiptForm: View {
                 printReceiptLineLanguage(lines_group: lines_group, lines: lines)
             }
         }
+        
+        
     }
     
     
@@ -393,8 +115,8 @@ struct ReceiptForm: View {
         var current_index = 0
         for i in 1..<(lines.count) {
             // (テキストの左端が半分以上でかつテキストの右端がレシートの5/7)後で処理
-            if false && Float(lines[i].frame.origin.x) >= Float(image!.size.width) / 2.0
-                && Float(lines[i].frame.origin.x) + Float(lines[i].frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+            if false && Float(lines[i].frame.origin.x) >= Float(selected_image!.size.width) / 2.0
+                && Float(lines[i].frame.origin.x) + Float(lines[i].frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                 right_lines.append(lines[i])
             }
             else if abs(Float(lines[i].frame.origin.y) - Float(lines[i-1].frame.origin.y)) < Float(min_height) * 2.0 / 5.0 {
@@ -465,8 +187,8 @@ struct ReceiptForm: View {
                 for _ in 1..<max(1, Int(floor(line.frame.size.height / min_height * 2 / 3))) {
                     double_angle_text += "^"
                 }
-                line_width_text += String(Int((line.frame.origin.x - prev_x) / image!.size.width * CGFloat(char_count))) + ","
-                if i > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                line_width_text += String(Int((line.frame.origin.x - prev_x) / selected_image!.size.width * CGFloat(char_count))) + ","
+                if i > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                     line_text += " " + double_angle_text + line.text + "|"
                 }
                 else {
@@ -474,7 +196,7 @@ struct ReceiptForm: View {
                 }
                 prev_x = line.frame.origin.x
             }
-            line_width_text += String(Int((image!.size.width - prev_x) / image!.size.width * CGFloat(char_count))) + "}"
+            line_width_text += String(Int((selected_image!.size.width - prev_x) / selected_image!.size.width * CGFloat(char_count))) + "}"
             print(line_width_text)
             print(line_text)
         }
@@ -493,8 +215,8 @@ struct ReceiptForm: View {
         var min_height: CGFloat = 10000.0
         var char_count = -1
         var count = -1
-        var receipt_line: ReceiptLine = ReceiptLine()
-        var status: Int = FM_status.branch.rawValue
+        receipt_line.store_information.store_name = "familymart"
+        var processing_status: Int = FM_status.branch.rawValue
         var existsBranchStore = -1, existsPhone = -1, existsDateTime = -1, existsRegisterNumber = -1, existsResponsibilyNumber = -1, existsReceipt = -1
         for line in lines {
             if min_height > line.frame.size.height {
@@ -541,11 +263,11 @@ struct ReceiptForm: View {
             prev_x = 0.0
             // 店情報、責任情報が取得できない場合
             if (existsBranchStore == -1 || existsPhone == -1 || existsDateTime == -1 || existsRegisterNumber == -1 || existsResponsibilyNumber == -1) && i <= existsReceipt {
-                status = -1
+                processing_status = -1
             }
             // 領収証の後かどうか
             if existsReceipt + 1 == i {
-                status = FM_status.item.rawValue
+                processing_status = FM_status.item.rawValue
             }
             for (j, line) in g_lines.enumerated() {
                 //文字の大きさを決定
@@ -553,10 +275,10 @@ struct ReceiptForm: View {
                     double_angle_text += "^"
                 }
                 // 座標を指定(全体の文字数からどのくらいの幅を取るべきか)
-                line_width_text += String(Int((line.frame.origin.x - prev_x) / image!.size.width * CGFloat(char_count))) + ","
+                line_width_text += String(Int((line.frame.origin.x - prev_x) / selected_image!.size.width * CGFloat(char_count))) + ","
                 if i == 0 { // ロゴかどうか
                     // true: 右端のものであると判断 false: 通常の表示
-                    if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                    if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                         line_text += " " + double_angle_text + line.text + "|"
                     }
                     else {
@@ -566,7 +288,7 @@ struct ReceiptForm: View {
                 else {
                     
                     // 要素の抽出処理
-                    switch status {
+                    switch processing_status {
                     case FM_status.branch.rawValue:
                         if line.text.suffix(1)=="店" {
                             receipt_line.store_information.branch_name += line.text.prefix(line.text.count-1)
@@ -577,7 +299,7 @@ struct ReceiptForm: View {
                                 txt = "#{store_information.branch_name[\(cnt)-\(cnt+line.text.count-1)]}店"
                             }
                             cnt = 0;
-                            status += 1
+                            processing_status += 1
                             //print("branch="+receipt_line.store_information.branch_name)
                             
                         }
@@ -587,7 +309,7 @@ struct ReceiptForm: View {
                             cnt += line.text.count
                         }
                         // true: 右端のものであると判断 false: 通常の表示
-                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                             line_text += " " + double_angle_text + txt + "|"
                         }
                         else {
@@ -598,7 +320,7 @@ struct ReceiptForm: View {
                             cnt = 0
                             receipt_line.store_information.phone_number += line.text.suffix(line.text.count-3)
                             txt = "電話:#{store_information.phone_number}"
-                            status += 1
+                            processing_status += 1
                         }
                         else {
                             receipt_line.store_information.address += line.text
@@ -606,7 +328,7 @@ struct ReceiptForm: View {
                             cnt += line.text.count
                         }
                         // true: 右端のものであると判断 false: 通常の表示
-                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                             line_text += " " + double_angle_text + txt + "|"
                         }
                         else {
@@ -618,9 +340,9 @@ struct ReceiptForm: View {
                             receipt_line.store_information.daytime = getDayTime(text: line.text)
                             txt = "#{store_information.daytime.year}年#{store_information.daytime.month}月#{store_information.daytime.date}日(#{store_information.daytime.week})#{store_information.daytime.time}:#{store_information.daytime.minite}"
                             //print(receipt_line.store_information.daytime)
-                            status += 1
+                            processing_status += 1
                             cnt = 0
-                            if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                            if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                                 line_text += " " + double_angle_text + txt + "|"
                             }
                             else {
@@ -628,7 +350,7 @@ struct ReceiptForm: View {
                             }
                         }
                         else {
-                            if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                            if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                                 line_text += " " + double_angle_text + line.text + "|"
                             }
                             else {
@@ -643,13 +365,13 @@ struct ReceiptForm: View {
                         else if line.text.prefix(1) == "責" {
                             receipt_line.register_information.responsibily_number =  String(NumericalExtraction(line.text))
                             txt = "責No.#{receipt_line.register_information.register_number}"
-                            status = -1
+                            processing_status = -1
                         }
                         else {
                             txt = line.text
                         }
                         cnt = 0
-                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                             line_text += " " + double_angle_text + txt + "|"
                         }
                         else {
@@ -662,7 +384,7 @@ struct ReceiptForm: View {
                             receipt_line.item_information.count = element_count + 1
                             new_item = Item(-1)
                             element_count = -1
-                            status += 1
+                            processing_status += 1
                             txt = line.text
                         }
                         else if line.text.contains("商品合計") && j == 0 {
@@ -713,7 +435,7 @@ struct ReceiptForm: View {
                             txt = "¥#{receipt_line.item_infotmation.items[\(element_count)].subtotal}#{receipt_line.item_infotmation.items[\(element_count)].is_reduced_tax_rate?`軽`:``}"
                         }
 
-                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                             line_text += " " + double_angle_text + txt + "|"
                         }
                         else {
@@ -726,9 +448,9 @@ struct ReceiptForm: View {
                         else {
                             receipt_line.accounting_information.total_sum = NumericalExtraction(line.text)
                             txt = "¥#{receipt_line.accounting_information.total_sum}"
-                            status += 1
+                            processing_status += 1
                         }
-                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                             line_text += " " + double_angle_text + txt + "|"
                         }
                         else {
@@ -802,7 +524,7 @@ struct ReceiptForm: View {
                             txt = line.text
                         }
                         
-                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                             line_text += " " + double_angle_text + txt + "|"
                         }
                         else {
@@ -811,7 +533,7 @@ struct ReceiptForm: View {
 //                    case FM_status.payment.rawValue:
                     default:
                         // true: 右端のものであると判断 false: 通常の表示
-                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(image!.size.width) * 5 / 7 {
+                        if j > 0 && Float(line.frame.origin.x) + Float(line.frame.size.width) >= Float(selected_image!.size.width) * 5 / 7 {
                             line_text += " " + double_angle_text + line.text + "|"
                         }
                         else {
@@ -822,15 +544,31 @@ struct ReceiptForm: View {
                 //座標比較用
                 prev_x = line.frame.origin.x
             }
-            line_width_text += String(Int((image!.size.width - prev_x) / image!.size.width * CGFloat(char_count))) + "}"
-            receipt_line.receipt_line_information.lines.append(Line(line_width_text))
-            receipt_line.receipt_line_information.lines.append(Line(line_text))
-            receipt_line.receipt_line_information.count += 2
+            line_width_text += String(Int((selected_image!.size.width - prev_x) / selected_image!.size.width * CGFloat(char_count))) + "}"
+            receipt_line.receipt_line_information.lines.append(Line(receipt_line.receipt_line_information.count,line_width_text))
+            receipt_line.receipt_line_information.count += 1
+            receipt_line.receipt_line_information.lines.append(Line(receipt_line.receipt_line_information.count,line_text))
+            receipt_line.receipt_line_information.count += 1
             print(line_width_text)
             print(line_text)
-            
         }
-        print(receipt_line)
+        
+        self.processing = false
+        status = Status.createReceiptLine
+        self.selected_image = nil
+        
+        //print(receipt_line.toXMLString() ?? "nil")
+//        let xmlString = receipt_line.toXMLString() ?? "nil"
+//        let data = Data(xmlString.utf8) // Data for deserialization (from XML to object)
+//        do {
+//            let xml = try XMLSerialization.xmlObject(with: data, options: [.default, .cdataAsString])
+//            let rl = XMLMapper<ReceiptLine>().map(XMLObject: xml)
+//            print(rl!)
+//            //print("test")
+//        } catch {
+//            print(error)
+//        }
+        //print(receipt_line)
     }
     
     func isBranchStore(text: String) -> Bool {
@@ -903,13 +641,13 @@ struct ReceiptForm: View {
         let pattern = #"(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日\((.)\)\s*(\d{1,2}):\s*(\d{1,2})"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return DayTime() }
         let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
-        var daytime = DayTime()
-        daytime.year = NSString(string: text).substring(with: r!.range(at: 1))
-        daytime.month = NSString(string: text).substring(with: r!.range(at: 2))
-        daytime.date = NSString(string: text).substring(with: r!.range(at: 3))
+        let daytime = DayTime()
+        daytime.year = Int(NSString(string: text).substring(with: r!.range(at: 1)))!
+        daytime.month = Int(NSString(string: text).substring(with: r!.range(at: 2)))!
+        daytime.date = Int(NSString(string: text).substring(with: r!.range(at: 3)))!
         daytime.week = NSString(string: text).substring(with: r!.range(at: 4))
-        daytime.time = NSString(string: text).substring(with: r!.range(at: 5))
-        daytime.minute = NSString(string: text).substring(with: r!.range(at: 6))
+        daytime.time = Int(NSString(string: text).substring(with: r!.range(at: 5)))!
+        daytime.minute = Int(NSString(string: text).substring(with: r!.range(at: 6)))!
         return daytime
     }
     
@@ -931,24 +669,35 @@ struct ReceiptForm: View {
 //        print(line.text)
 //        print(count)
 //        print(line.frame.size.width)
-//        print(image!.size.width)
-//        print(Int(Float(count) * Float(image!.size.width / line.frame.size.width)))
-        return Int(Float(count) * Float(image!.size.width / line.frame.size.width) )
+//        print(selected_image!.size.width)
+//        print(Int(Float(count) * Float(selected_image!.size.width / line.frame.size.width)))
+        return Int(Float(count) * Float(selected_image!.size.width / line.frame.size.width) )
     }
+    
+    
 
     //パターン認識でロゴをチェック（予定）
     func LogoCheck() -> String {
         return "familymart"
     }
-    
 }
 
-struct ReceiptForm_Previews: PreviewProvider {
+struct CameraView_Previews: PreviewProvider {
     static var previews: some View {
-        ReceiptForm()
-            .environmentObject(UserData())
-        
+        CameraView()
     }
 }
 
+struct ActivityIndicator: UIViewRepresentable {
+    @Binding var isAnimating: Bool
 
+    let style: UIActivityIndicatorView.Style
+
+    func makeUIView(context: Context) -> UIActivityIndicatorView {
+        UIActivityIndicatorView(style: style)
+    }
+
+    func updateUIView(_ uiView: UIActivityIndicatorView, context: Context) {
+        isAnimating ? uiView.startAnimating() : uiView.stopAnimating()
+    }
+}

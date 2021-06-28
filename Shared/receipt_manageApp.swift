@@ -8,13 +8,18 @@
 import SwiftUI
 
 import Firebase
+import PartialSheet
 
 @main
 struct receipt_manageApp: App {
+    let sheetManager: PartialSheetManager = PartialSheetManager()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+//            HomeView()
+            
+            ContentView2()
                 .environmentObject(UserData())
+                .environmentObject(sheetManager)
         }
     }
     init(){

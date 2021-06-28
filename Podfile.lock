@@ -1,4 +1,5 @@
 PODS:
+  - Alamofire (5.4.3)
   - Firebase (6.34.0):
     - Firebase/Core (= 6.34.0)
   - Firebase/Analytics (6.34.0):
@@ -114,6 +115,12 @@ PODS:
   - PromisesObjC (1.2.12)
   - Protobuf (3.15.8)
   - SwiftyTesseract (3.1.3)
+  - XMLMapper (2.0.0):
+    - XMLMapper/Core (= 2.0.0)
+  - XMLMapper/Core (2.0.0)
+  - XMLMapper/Requests (2.0.0):
+    - Alamofire (~> 5.4)
+    - XMLMapper/Core
 
 DEPENDENCIES:
   - Firebase
@@ -122,9 +129,12 @@ DEPENDENCIES:
   - Firebase/MLVision
   - Firebase/MLVisionTextModel
   - SwiftyTesseract (~> 3.0)
+  - XMLMapper
+  - XMLMapper/Requests
 
 SPEC REPOS:
   trunk:
+    - Alamofire
     - Firebase
     - FirebaseAnalytics
     - FirebaseCore
@@ -143,8 +153,10 @@ SPEC REPOS:
     - PromisesObjC
     - Protobuf
     - SwiftyTesseract
+    - XMLMapper
 
 SPEC CHECKSUMS:
+  Alamofire: e447a2774a40c996748296fa2c55112fdbbc42f9
   Firebase: c23a36d9e4cdf7877dfcba8dd0c58add66358999
   FirebaseAnalytics: 3bb096873ee0d7fa4b6c70f5e9166b6da413cc7f
   FirebaseCore: d3a978a3cfa3240bf7e4ba7d137fdf5b22b628ec
@@ -163,7 +175,8 @@ SPEC CHECKSUMS:
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   Protobuf: adb85cd18a15bd1a777c158af9fd6e612a0e6d69
   SwiftyTesseract: 1f3d96668ae92dc2208d9842c8a59bea9fad2cbb
+  XMLMapper: 45ff16367092620b0b4adbc5e42dd8db6ebb5e0d
 
-PODFILE CHECKSUM: 523676167dbef63dadd249c79a12b3ffb4c27f5f
+PODFILE CHECKSUM: f60866f85db55d1a3a4190ab5d69b2d1807223c7
 
 COCOAPODS: 1.10.1

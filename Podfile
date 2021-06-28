@@ -13,6 +13,8 @@ target 'receipt_manage (iOS)' do
   pod 'Firebase/MLVision'
   # If using an on-device API:
   pod 'Firebase/MLVisionTextModel'
+  pod 'XMLMapper'
+  pod 'XMLMapper/Requests'
 end
 
 target 'receipt_manage (macOS)' do
