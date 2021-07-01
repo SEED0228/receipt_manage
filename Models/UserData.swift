@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 import Foundation
 import XMLMapper
 
@@ -29,25 +30,26 @@ class UserData: ObservableObject {
             let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             let contentURLs = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
             for url in contentURLs {
-                let data = readFromFile(url: url)
-//                print(url.path.suffix(40).prefix(36)) //uuidの取得
-                do {
-                    let xml = try XMLSerialization.xmlObject(with: data, options: [.default, .cdataAsString])
-                    let rl = XMLMapper<ReceiptLine>().map(XMLObject: xml)!
-                    rl.uuid = UUID(uuidString: String(url.path.suffix(40).prefix(36)))!
-                    receipt_lines.append(rl)
-//                    print(rl!.uuid)
-                } catch {
-                    print(error)
+                if !url.path.contains("/.") {
+                    let data = readFromFile(url: url)
+    //                print(url.path.suffix(40).prefix(36)) //uuidの取得
+                    do {
+                        let xml = try XMLSerialization.xmlObject(with: data, options: [.default, .cdataAsString])
+                        let rl = XMLMapper<ReceiptLine>().map(XMLObject: xml)!
+                        rl.uuid = UUID(uuidString: String(url.path.suffix(40).prefix(36)))!
+                        receipt_lines.append(rl)
+    //                    print(rl!.uuid)
+                    } catch {
+                        print(error)
+                    }
+    //                print(receipt_line)
                 }
-//                print(receipt_line)
-                
             }
             sortReceiptLine()
-            print(receipt_lines)
-            for i in receipt_lines {
-                print(i.store_information.daytime.toString())
-            }
+//            print(receipt_lines)
+//            for i in receipt_lines {
+////                print(i.store_information.daytime.toString())
+//            }
 //            print(contentURLs)
         } catch {
             print(error)
@@ -56,13 +58,11 @@ class UserData: ObservableObject {
     
     func readFromFile(url: URL) -> Data {
         guard let fileContents = try? Data(contentsOf: url) else {
+            print(url)
             fatalError("ファイル読み込みエラー")
         }
         return fileContents
     }
-
-
-    
     
 }
 

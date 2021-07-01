@@ -12,7 +12,7 @@ import XMLMapper
 class ReceiptLine: XMLMappable {
     
     var nodeName: String! = "receipt"
-    var nodesOrder: [String]? = ["store_information", " register_information", "item_information", "accounting_information", "payment_information", "receipt_line_information"]
+    var nodesOrder: [String]? = ["store_information", "register_information", "item_information", "accounting_information", "payment_information", "receipt_line_information"]
     
     var uuid = UUID()
     
@@ -40,6 +40,191 @@ class ReceiptLine: XMLMappable {
         payment_information <- map["payment_information"]
         receipt_line_information <- map["receipt_line_information"]
         nodesOrder <- map.nodesOrder
+    }
+    
+    func convertToOSS() -> String {
+        var converted_text = ""
+        for line in self.receipt_line_information.lines {
+            let pattern = #"#\{.*?\}"#
+            guard let regex = try? NSRegularExpression(pattern: pattern) else {
+                print("error")
+                return "error"
+            }
+            let results = regex.matches(in: line.line, range: NSRange(location: 0, length: line.line.count))
+//            print(results.count)
+            var elements: [String] = []
+            for result in results {
+                for i in 0..<result.numberOfRanges {
+                    let start = line.line.index(line.line.startIndex, offsetBy: result.range(at: i).location)
+                    let end = line.line.index(start, offsetBy: result.range(at: i).length)
+                    let text = String(line.line[start..<end])
+                    var fixed_text = String(text.prefix(text.count - 1).suffix(text.count-3))
+                    fixed_text = fixed_text.replacingOccurrences(of: "`", with: "\"")
+//                    print(fixed_text)
+//                    print(getReceiptLineElement(receipt_line: receipt_line, text: fixed_text))
+                    elements.append(getReceiptLineElement(text: fixed_text))
+                }
+            }
+            let mstring = NSMutableString(string: line.line)
+            regex.replaceMatches(in: mstring, options: [], range: NSRange(0..<line.line.count), withTemplate: "#")
+//            print(mstring)
+            let array = String(mstring).replacingOccurrences(of: "##", with: "# #").split(separator: "#")
+//            print(array)
+            converted_text += array[0]
+//            print(array[0], terminator: "")
+            for i in 0..<elements.count {
+                converted_text += elements[i] + array[i+1]
+//                print(elements[i], terminator: "")
+//                print(array[i+1], terminator: "")
+            }
+            converted_text += "\n"
+//            print("")
+        }
+//        print(converted_text)
+        return converted_text
+    }
+    
+    func getReceiptLineElement(text: String) -> String {
+        let array = text.split(separator: ".")
+        var index: Int = -1
+//        print(array)
+        switch array[0] {
+        case "store_information":
+            switch array[1] {
+            case "store_name":
+                return self.store_information.store_name
+            case "branch_name":
+                return self.store_information.branch_name
+            case "phone_number":
+                return self.store_information.phone_number
+            case "daytime":
+                switch array[2] {
+                case "year":
+                    return String(self.store_information.daytime.year)
+                case "month":
+                    return String(format: "%02d", self.store_information.daytime.month)
+                case "date":
+                    return String(format: "%02d", self.store_information.daytime.date)
+                case "week":
+                    return self.store_information.daytime.week
+                case "time":
+                    return String(format: "%02d", self.store_information.daytime.time)
+                case "minute":
+                    return String(format: "%02d", self.store_information.daytime.minute)
+                case "minite":
+                    return String(format: "%02d", self.store_information.daytime.minute)
+                default:
+                    return ""
+                }
+            default:
+                if array[1].prefix(7) == "address" {
+                    let pattern = #"\[(\d*)-(\d*)\]"#
+                    let text = String(array[1])
+                    let start: Int, end: Int
+                    if let regex = try? NSRegularExpression(pattern: pattern) {
+                        let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
+                        start = Int(NSString(string: text).substring(with: r!.range(at: 1)))!
+                        end = Int(NSString(string: text).substring(with: r!.range(at: 2)))!
+                        return String(self.store_information.address.suffix(self.store_information.address.count - start).prefix(end - start + 1))
+                    }
+                }
+                return ""
+            }
+        case "register_information":
+            switch array[1] {
+            case "register_number":
+                return self.register_information.register_number
+            case "responsibility_number":
+                return self.register_information.responsibily_number
+            default :
+                return ""
+            }
+        case "item_infotmation":
+            switch array[1] {
+            case "count":
+                return String(self.item_information.count)
+            default:
+                if String(array[1]).prefix(5) == "items" {
+                    let pattern = #"\[(\d*)\]"#
+                    let text = String(array[1])
+                    if let regex = try? NSRegularExpression(pattern: pattern) {
+                        let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
+                        index = Int(NSString(string: text).substring(with: r!.range(at: 1)))!
+//                        print(index)
+                    }
+                    switch array[2] {
+                    case "name":
+                        return self.item_information.items[index].name
+                    case "subtotal":
+                        return String(self.item_information.items[index].subtotal)
+                    case "discount":
+                        return String(self.item_information.items[index].discount)
+                    case "unit_price":
+                        return String(self.item_information.items[index].unit_price)
+                    case "quantity":
+                        return String(self.item_information.items[index].quantity)
+                    default:
+                        if String(array[2]).prefix(19) == "is_reduced_tax_rate" {
+                            let pattern = #"\?\"(.*)\":\"(.*)\""#
+                            let text = String(array[2])
+                            if let regex = try? NSRegularExpression(pattern: pattern) {
+                                let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
+//                                print(String(NSString(string: text).substring(with: r!.range(at: 1))))
+                                return self.item_information.items[index].is_reduced_tax_rate ? String(NSString(string: text).substring(with: r!.range(at: 1))) : String(NSString(string: text).substring(with: r!.range(at: 2)))
+                            }
+                        }
+                    }
+                }
+            }
+            return ""
+        case "accounting_information":
+            switch array[1] {
+            case "total_sum":
+                return String(self.accounting_information.total_sum)
+            case "total_sum_8":
+                return String(self.accounting_information.total_sum_8)
+            case "total_sum_10":
+                return String(self.accounting_information.total_sum_10)
+            case "item_total":
+                return String(self.accounting_information.item_total)
+            case "discount_total":
+                return String(self.accounting_information.discount_total)
+            case "internal_consumption_tex":
+                return String(self.accounting_information.internal_consumption_tex)
+            default:
+                return ""
+            }
+        case "payment_information":
+            switch array[1] {
+            case "count":
+                return String(self.payment_information.count)
+            case "change":
+                return String(self.payment_information.change)
+            case "deposit":
+                return String(self.payment_information.deposit)
+            default :
+                if String(array[1]).prefix(15) == "payment_methods" {
+                    let pattern = #"\[(\d*)\]"#
+                    let text = String(array[1])
+                    if let regex = try? NSRegularExpression(pattern: pattern) {
+                        let r = regex.firstMatch(in: text, range: NSRange(location: 0, length: text.count))
+                        index = Int(NSString(string: text).substring(with: r!.range(at: 1)))!
+//                        print(index)
+                    }
+                    switch array[2] {
+                    case "name" :
+                        return self.payment_information.payment_methods[index].name
+                    case "paid" :
+                        return String(self.payment_information.payment_methods[index].paid)
+                    default:
+                        return ""
+                    }
+                }
+                return ""
+            }
+        default :
+            return ""
+        }
     }
 }
 
@@ -130,7 +315,7 @@ class DayTime: XMLMappable {
 class RegisterInformation: XMLMappable {
     
     var nodeName: String!
-    var nodesOrder: [String]? = ["reister_number", "responsibility_number"]
+    var nodesOrder: [String]? = ["register_number", "responsibily_number"]
     
     var register_number: String = ""
     var responsibily_number: String = ""

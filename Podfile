@@ -15,6 +15,7 @@ target 'receipt_manage (iOS)' do
   pod 'Firebase/MLVisionTextModel'
   pod 'XMLMapper'
   pod 'XMLMapper/Requests'
+  pod 'Alamofire', '~> 5.4'
 end
 
 target 'receipt_manage (macOS)' do

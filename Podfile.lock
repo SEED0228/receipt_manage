@@ -123,6 +123,7 @@ PODS:
     - XMLMapper/Core
 
 DEPENDENCIES:
+  - Alamofire (~> 5.4)
   - Firebase
   - Firebase/Analytics
   - Firebase/Core
@@ -177,6 +178,6 @@ SPEC CHECKSUMS:
   SwiftyTesseract: 1f3d96668ae92dc2208d9842c8a59bea9fad2cbb
   XMLMapper: 45ff16367092620b0b4adbc5e42dd8db6ebb5e0d
 
-PODFILE CHECKSUM: f60866f85db55d1a3a4190ab5d69b2d1807223c7
+PODFILE CHECKSUM: e390a78d012c3a597280d81248a9fa6016ab7092
 
 COCOAPODS: 1.10.1

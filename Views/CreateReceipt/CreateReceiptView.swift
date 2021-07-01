@@ -147,10 +147,10 @@ struct CreateReceiptView: View {
             fileManager.createFile(atPath: path.path,
                                    contents: data, attributes: nil)
 //            try data.write(to: path)
-            print("success")
-            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let contentURLs = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
-            print(contentURLs)
+//            print("success")
+//            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+//            let contentURLs = try FileManager.default.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
+//            print(contentURLs)
         } catch {
             print(error)
         }

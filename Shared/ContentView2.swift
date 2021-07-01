@@ -40,6 +40,10 @@ struct ContentView2: View {
         .addPartialSheet()
         .onAppear{
             userData.load_receipt_lines()
+            let rls = userData.receipt_lines.filter{
+                $0.payment_information.count >= 1
+            }
+            print(rls[0].convertToOSS())
         }
     }
     

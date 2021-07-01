@@ -352,7 +352,7 @@ struct CameraView: View {
                         if line.text.prefix(2) == "20" {
                             txt = line.text
                             receipt_line.store_information.daytime = getDayTime(text: line.text)
-                            txt = "#{store_information.daytime.year}年#{store_information.daytime.month}月#{store_information.daytime.date}日(#{store_information.daytime.week})#{store_information.daytime.time}:#{store_information.daytime.minite}"
+                            txt = "#{store_information.daytime.year}年#{store_information.daytime.month}月#{store_information.daytime.date}日(#{store_information.daytime.week})#{store_information.daytime.time}:#{store_information.daytime.minute}"
                             //print(receipt_line.store_information.daytime)
                             processing_status += 1
                             cnt = 0
@@ -377,8 +377,8 @@ struct CameraView: View {
                             txt = "レジ #{register_information.register_number}"
                         }
                         else if line.text.prefix(1) == "責" {
-                            receipt_line.register_information.responsibily_number =  String(NumericalExtraction(line.text))
-                            txt = "責No.#{register_information.register_number}"
+                            receipt_line.register_information.responsibily_number =  String(format: "%03d", NumericalExtraction(line.text))
+                            txt = "責No.#{register_information.responsibily_number}"
                             processing_status = -1
                         }
                         else {

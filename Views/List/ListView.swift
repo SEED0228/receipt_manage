@@ -49,7 +49,7 @@ struct ListView: View {
     }
     
     func getStringDate(receipt_line: ReceiptLine) -> String {
-        print(receipt_line.store_information.store_name)
+//        print(receipt_line.store_information.store_name)
         return receipt_line.store_information.daytime.toString()
     }
     
@@ -74,7 +74,7 @@ struct ListView: View {
         values = keys.compactMap { receipt_lines[$0] }
         for i in values {
             for j in i {
-                print(j.store_information.daytime.toStringDate())
+//                print(j.store_information.daytime.toStringDate())
             }
         }
     }
